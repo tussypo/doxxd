@@ -53,6 +53,13 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Cyberpunk theme colors
+				cyberpink: '#D946EF',
+				cyberpurple: '#9b87f5',
+				cyberpurple2: '#7E69AB',
+				cyberblue: '#0EA5E9',
+				cyberblue2: '#1EAEDB',
+				cyberdark: '#1A1F2C',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -109,6 +116,25 @@ export default {
 						opacity: '0.85',
 						transform: 'scale(0.98)'
 					}
+				},
+				'cyber-glow': {
+					'0%, 100%': {
+						filter: 'drop-shadow(0 0 5px rgba(215, 70, 239, 0.7))'
+					},
+					'50%': {
+						filter: 'drop-shadow(0 0 15px rgba(215, 70, 239, 0.9))'
+					}
+				},
+				'neon-pulse': {
+					'0%': { 
+						boxShadow: '0 0 5px rgba(215, 70, 239, 0.7), 0 0 10px rgba(215, 70, 239, 0.5), 0 0 15px rgba(215, 70, 239, 0.3)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 10px rgba(215, 70, 239, 0.9), 0 0 20px rgba(215, 70, 239, 0.7), 0 0 30px rgba(215, 70, 239, 0.5)' 
+					},
+					'100%': { 
+						boxShadow: '0 0 5px rgba(215, 70, 239, 0.7), 0 0 10px rgba(215, 70, 239, 0.5), 0 0 15px rgba(215, 70, 239, 0.3)' 
+					}
 				}
 			},
 			animation: {
@@ -120,7 +146,9 @@ export default {
 				'slide-down': 'slide-down 0.4s ease-out',
 				'scale-in': 'scale-in 0.4s ease-out',
 				'reveal': 'reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1)',
-				'pulse-light': 'pulse-light 2s infinite'
+				'pulse-light': 'pulse-light 2s infinite',
+				'cyber-glow': 'cyber-glow 2s infinite ease-in-out',
+				'neon-pulse': 'neon-pulse 2s infinite ease-in-out',
 			}
 		}
 	},

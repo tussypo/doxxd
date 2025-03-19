@@ -4,20 +4,20 @@ import Navbar from '@/components/Navbar';
 import PostCard, { Post } from '@/components/PostCard';
 import CreatePost from '@/components/CreatePost';
 import { cn } from '@/lib/utils';
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, X, Zap } from 'lucide-react';
 
 // Mock data for demonstration
 const generateMockPosts = (count: number): Post[] => {
   return Array.from({ length: count }, (_, i) => ({
     id: `post-${i}`,
     content: [
-      "Just discovered the most amazing coffee shop downtown. The ambiance is perfect for working remotely!",
-      "Does anyone else think that modern superhero movies are becoming too formulaic?",
-      "I've been learning to code for 3 months now and finally built my first real project yesterday!",
-      "Hot take: breakfast foods are actually better when eaten for dinner.",
-      "Just finished reading a book that completely changed my perspective on life. Isn't it amazing how words on paper can do that?",
-      "What's a skill you've always wanted to learn but haven't had the time for?",
-      "Unpopular opinion: social media has done more harm than good for society.",
+      "Just discovered a new neural implant that boosts reaction time by 200%! Anyone else tried it?",
+      "The new holographic displays in the Lower District are absolutely stunning. Worth checking out at night.",
+      "Rumors about a data breach at MegaCorp are spreading. Anyone know if they're legit?",
+      "Hot take: synthetic food tastes better than the real thing now.",
+      "Just finished coding a new cyberdeck interface that completely changed my net-diving experience. Incredible what custom scripts can do.",
+      "What's a skill chip you've always wanted to install but haven't saved up for?",
+      "Unpopular opinion: the new neural network regulations have actually made the net safer for everyone.",
     ][i % 7],
     votes: Math.floor(Math.random() * 150),
     commentCount: Math.floor(Math.random() * 30),
@@ -25,7 +25,7 @@ const generateMockPosts = (count: number): Post[] => {
     author: {
       id: `user-${i}`,
       isRevealed: Math.random() > 0.7,
-      name: Math.random() > 0.7 ? ['Alex Johnson', 'Sam Rivera', 'Taylor Kim', 'Jordan Smith', 'Casey Wong'][i % 5] : null,
+      name: Math.random() > 0.7 ? ['N3tRUNN3R', 'CyberPsych0', 'Ghost_Protocol', 'Neon_Samurai', 'Void_Walker'][i % 5] : null,
       avatarUrl: Math.random() > 0.7 ? null : null,
       voteThreshold: 100,
       currentVotes: Math.floor(Math.random() * 120),
@@ -87,23 +87,23 @@ const Index = () => {
       
       <main className="pt-24 pb-20 px-4 md:px-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Home Feed</h1>
+          <h1 className="text-2xl font-bold cyber-gradient-text">Network Feed</h1>
         </div>
 
         {/* Desktop create post button */}
         <div className="hidden md:block mb-8">
           <button
             onClick={() => setShowCreatePost(true)}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-white hover:bg-secondary transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-md border border-white/10 glass hover:shadow-[0_0_15px_rgba(215,70,239,0.3)] transition-all"
           >
-            <PlusCircle className="h-5 w-5" />
+            <PlusCircle className="h-5 w-5 text-cyberpink" />
             <span className="font-medium">Create Post</span>
           </button>
         </div>
 
         {/* Create post modal */}
         {showCreatePost && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="w-full max-w-lg">
               <CreatePost 
                 onClose={() => setShowCreatePost(false)}
@@ -118,7 +118,7 @@ const Index = () => {
           {loading ? (
             // Loading skeletons
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl shadow-sm border border-border p-5 animate-pulse">
+              <div key={i} className="cyber-card p-5 animate-pulse">
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center space-y-2">
                     <div className="h-8 w-8 rounded-full bg-muted"></div>
@@ -157,7 +157,7 @@ const Index = () => {
       )}>
         <button
           onClick={() => setShowCreatePost(true)}
-          className="h-14 w-14 flex items-center justify-center rounded-full bg-black text-white shadow-lg hover:bg-black/90 transition-all btn-hover"
+          className="h-14 w-14 flex items-center justify-center rounded-full bg-gradient-to-r from-cyberpink to-cyberpurple text-white shadow-[0_0_15px_rgba(215,70,239,0.5)] hover:shadow-[0_0_20px_rgba(215,70,239,0.7)] transition-all btn-hover animate-neon-pulse"
         >
           <PlusCircle className="h-6 w-6" />
         </button>
