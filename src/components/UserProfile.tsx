@@ -3,6 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { User, Lock, Calendar } from 'lucide-react';
 import ProfileRevealAnimation from './ProfileRevealAnimation';
+import { Progress } from "@/components/ui/progress";
 
 export interface UserProfileData {
   id: string;
@@ -69,12 +70,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ profile, className }) => {
 
         {!profile.isRevealed && (
           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4">
-            <div className="h-2 bg-secondary rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-black transition-all duration-500"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
+            <Progress value={progressPercentage} className="h-2" />
             <div className="mt-1 text-xs text-muted-foreground">
               {profile.currentVotes}/{profile.voteThreshold} votes to reveal
             </div>

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { MessageCircle, Share, User, Lock, X } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
 
 export interface Post {
   id: string;
@@ -229,13 +230,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
                   )}
                 </div>
                 {!post.author.isRevealed && (
-                  <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-white flex items-center justify-center">
-                    <div className="h-3 w-3 rounded-full ring-1 ring-border overflow-hidden">
-                      <div 
-                        className="h-full bg-black transition-all duration-300"
-                        style={{ width: `${progressPercentage}%` }}
-                      />
-                    </div>
+                  <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-white flex items-center justify-center p-0.5">
+                    <Progress 
+                      value={progressPercentage} 
+                      className="h-full w-full rounded-full"
+                    />
                   </div>
                 )}
               </div>
@@ -253,6 +252,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
                 </div>
               </div>
             </div>
+            
+            {/* Show reveal progress percentage */}
+            {!post.author.isRevealed && (
+              <div className="text-xs text-muted-foreground bg-secondary rounded-full px-2 py-0.5">
+                {Math.round(progressPercentage)}% of 11%
+              </div>
+            )}
           </div>
 
           {/* Post content - Changed text color to black */}
