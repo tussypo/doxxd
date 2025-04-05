@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { ArrowUp, ArrowDown, MessageCircle, Share, User, Lock } from 'lucide-react';
+import { MessageCircle, Share, User, Lock, X } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 export interface Post {
   id: string;
@@ -27,22 +28,27 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
   const [voteCount, setVoteCount] = useState(post.votes);
-  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+  const [userBoosted, setUserBoosted] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const { toast } = useToast();
 
-  const handleVote = (direction: 'up' | 'down') => {
-    if (userVote === direction) {
-      // Undo vote
-      setVoteCount(direction === 'up' ? voteCount - 1 : voteCount + 1);
-      setUserVote(null);
+  const handleBoost = () => {
+    if (userBoosted) {
+      // Undo boost
+      setVoteCount(voteCount - 1);
+      setUserBoosted(false);
+      toast({
+        title: "Boost removed",
+        description: "You've removed your boost",
+      });
     } else {
-      // Change vote or new vote
-      const modifier = userVote ? 2 : 1;
-      setVoteCount(direction === 'up' 
-        ? voteCount + modifier 
-        : voteCount - modifier
-      );
-      setUserVote(direction);
+      // Add boost
+      setVoteCount(voteCount + 1);
+      setUserBoosted(true);
+      toast({
+        title: "Post boosted",
+        description: "You've boosted this post",
+      });
     }
   };
 
@@ -69,42 +75,27 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="flex gap-4">
-        {/* Vote Column */}
+        {/* Boost Column */}
         <div className="flex flex-col items-center space-y-1">
           <button 
-            onClick={() => handleVote('up')}
+            onClick={handleBoost}
             className={cn(
               "p-2 rounded-full transition-all vote-animation",
-              userVote === 'up' 
-                ? "bg-black text-white" 
+              userBoosted 
+                ? "bg-gradient-to-r from-cyberpink to-cyberpurple text-white shadow-[0_0_10px_rgba(215,70,239,0.5)]" 
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
+            aria-label="Boost post"
           >
-            <ArrowUp className="h-5 w-5" />
+            <X className={cn("h-5 w-5", userBoosted ? "animate-pulse" : "")} />
           </button>
           
           <span className={cn(
             "font-semibold text-lg transition-all duration-200",
-            userVote === 'up' 
-              ? "text-black"
-              : userVote === 'down'
-                ? "text-destructive"
-                : "text-muted-foreground"
+            userBoosted ? "text-cyberpink" : "text-muted-foreground"
           )}>
             {voteCount}
           </span>
-          
-          <button 
-            onClick={() => handleVote('down')}
-            className={cn(
-              "p-2 rounded-full transition-all vote-animation",
-              userVote === 'down' 
-                ? "bg-destructive text-white" 
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-            )}
-          >
-            <ArrowDown className="h-5 w-5" />
-          </button>
         </div>
 
         {/* Content Column */}
