@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { MessageCircle, Share, User, Lock, X } from 'lucide-react';
@@ -31,7 +31,26 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
   const [userBoosted, setUserBoosted] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const { toast } = useToast();
+  
+  // Swipe mechanics
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [swiping, setSwiping] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  
+  // Minimum required distance to be considered a swipe (in px)
+  const minSwipeDistance = 75;
+  
+  // Reset swipe state
+  const resetSwipe = () => {
+    setSwipeOffset(0);
+    setSwiping(false);
+    setSwipeDirection(null);
+  };
 
+  // Handle boost/deboost
   const handleBoost = () => {
     if (userBoosted) {
       // Undo boost
@@ -52,6 +71,76 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
     }
   };
 
+  const handleDeboost = () => {
+    // Always deboost, regardless of current state
+    setVoteCount(voteCount - 1);
+    setUserBoosted(false);
+    toast({
+      title: "Post deboosted",
+      description: "You've removed points from this post",
+      variant: "destructive"
+    });
+  };
+
+  // Touch event handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
+    setSwiping(true);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!swiping) return;
+    
+    const currentTouch = e.targetTouches[0].clientX;
+    setTouchEnd(currentTouch);
+    
+    // Calculate offset for animation
+    const offset = touchStart ? currentTouch - touchStart : 0;
+    
+    // Cap the offset to avoid extreme movements
+    const cappedOffset = Math.max(Math.min(offset, 100), -100);
+    setSwipeOffset(cappedOffset);
+    
+    // Determine direction for visual feedback
+    if (cappedOffset > 0) {
+      setSwipeDirection('right'); // Boost
+    } else if (cappedOffset < 0) {
+      setSwipeDirection('left'); // Deboost
+    } else {
+      setSwipeDirection(null);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) {
+      resetSwipe();
+      return;
+    }
+    
+    const distance = touchEnd - touchStart;
+    const isLeftSwipe = distance < -minSwipeDistance;
+    const isRightSwipe = distance > minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      // Swiped left - deboost
+      handleDeboost();
+    } else if (isRightSwipe) {
+      // Swiped right - boost
+      handleBoost();
+    }
+    
+    // Reset after processing
+    resetSwipe();
+  };
+
+  // Cleanup any animations on unmount
+  useEffect(() => {
+    return () => {
+      resetSwipe();
+    };
+  }, []);
+
   const progressPercentage = Math.min(
     (post.author.currentVotes / post.author.voteThreshold) * 100,
     100
@@ -67,13 +156,30 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
 
   return (
     <div 
+      ref={cardRef}
       className={cn(
-        "bg-white rounded-2xl shadow-sm border border-border p-5 transition-all duration-300 animate-scale-in card-hover",
-        compact ? "max-w-md" : "w-full max-w-2xl"
+        "bg-white rounded-2xl shadow-sm border border-border p-5 transition-all duration-300 animate-scale-in card-hover relative overflow-hidden",
+        compact ? "max-w-md" : "w-full max-w-2xl",
+        swiping && "cursor-grabbing"
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{
+        transform: `translateX(${swipeOffset}px)`,
+        transition: swiping ? 'none' : 'transform 0.3s ease-out',
+      }}
     >
+      {/* Swipe indicators - only show while swiping */}
+      {swiping && swipeDirection === 'right' && (
+        <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-r from-cyberpink to-cyberpurple opacity-70" />
+      )}
+      {swiping && swipeDirection === 'left' && (
+        <div className="absolute top-0 right-0 bottom-0 w-1 bg-destructive opacity-70" />
+      )}
+      
       <div className="flex gap-4">
         {/* Boost Column */}
         <div className="flex flex-col items-center space-y-1">
@@ -166,6 +272,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
             </button>
           </div>
         </div>
+      </div>
+      
+      {/* Swipe instructions - only visible on touch devices */}
+      <div className="mt-3 text-xs text-center text-muted-foreground hidden touch-device:block">
+        Swipe right to boost, left to deboost
       </div>
     </div>
   );
