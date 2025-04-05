@@ -4,8 +4,18 @@ import Navbar from '@/components/Navbar';
 import PostCard, { Post } from '@/components/PostCard';
 import { BarChart2 } from 'lucide-react';
 
+// Mock values - would be replaced with actual app user count in a real app
+const TOTAL_USERS = 1000; // Example total users
+const REVEAL_THRESHOLD_PERCENTAGE = 11; // 11% of users needed to reveal
+
+// Calculate the votes needed to reveal an identity
+const calculateVoteThreshold = () => {
+  return Math.ceil(TOTAL_USERS * (REVEAL_THRESHOLD_PERCENTAGE / 100));
+};
+
 // Reuse the mock data generation from Index.tsx
 const generateMockPosts = (count: number): Post[] => {
+  const voteThreshold = calculateVoteThreshold();
   return Array.from({ length: count }, (_, i) => ({
     id: `post-${i}`,
     content: [
@@ -25,7 +35,7 @@ const generateMockPosts = (count: number): Post[] => {
       isRevealed: Math.random() > 0.5, // More revealed profiles in trending
       name: Math.random() > 0.5 ? ['Alex Johnson', 'Sam Rivera', 'Taylor Kim', 'Jordan Smith', 'Casey Wong'][i % 5] : null,
       avatarUrl: null,
-      voteThreshold: 100,
+      voteThreshold: voteThreshold,
       currentVotes: 80 + Math.floor(Math.random() * 50), // Higher progress
     },
   })).sort((a, b) => b.votes - a.votes); // Sort by votes

@@ -109,11 +109,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ profile, className }) => {
         </div>
       </div>
 
-      {profile.isRevealed && (
+      {profile.isRevealed ? (
         <div className="mt-4 text-sm text-muted-foreground">
           <span className="inline-block px-3 py-1 bg-black/5 rounded-full">
             Identity Revealed
           </span>
+        </div>
+      ) : (
+        <div className="mt-4 text-xs text-muted-foreground max-w-xs">
+          When this profile receives votes from 11% of users, the identity will be revealed
         </div>
       )}
     </div>

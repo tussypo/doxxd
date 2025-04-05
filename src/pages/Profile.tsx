@@ -5,8 +5,18 @@ import Navbar from '@/components/Navbar';
 import UserProfile, { UserProfileData } from '@/components/UserProfile';
 import PostCard, { Post } from '@/components/PostCard';
 
+// Mock values - would be replaced with actual app user count in a real app
+const TOTAL_USERS = 1000; // Example total users
+const REVEAL_THRESHOLD_PERCENTAGE = 11; // 11% of users needed to reveal
+
+// Calculate the votes needed to reveal an identity
+const calculateVoteThreshold = () => {
+  return Math.ceil(TOTAL_USERS * (REVEAL_THRESHOLD_PERCENTAGE / 100));
+};
+
 // Mock data
 const getMockProfile = (revealed: boolean = false): UserProfileData => {
+  const voteThreshold = calculateVoteThreshold();
   return {
     id: 'user-1',
     isRevealed: revealed,
@@ -18,13 +28,14 @@ const getMockProfile = (revealed: boolean = false): UserProfileData => {
       posts: 24,
       votesReceived: 283,
     },
-    voteThreshold: 100,
-    currentVotes: revealed ? 100 : 67,
+    voteThreshold: voteThreshold,
+    currentVotes: revealed ? voteThreshold : Math.floor(voteThreshold * 0.67),
     recentlyRevealed: revealed && Math.random() > 0.5,
   };
 };
 
 const getMockPosts = (count: number, userId: string): Post[] => {
+  const voteThreshold = calculateVoteThreshold();
   return Array.from({ length: count }, (_, i) => ({
     id: `post-${i}`,
     content: [
@@ -42,7 +53,7 @@ const getMockPosts = (count: number, userId: string): Post[] => {
       isRevealed: getMockProfile().isRevealed,
       name: getMockProfile().name,
       avatarUrl: getMockProfile().avatarUrl,
-      voteThreshold: 100,
+      voteThreshold: voteThreshold,
       currentVotes: getMockProfile().currentVotes,
     },
   }));

@@ -255,9 +255,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
             </div>
           </div>
 
-          {/* Post content */}
+          {/* Post content - Changed text color to black */}
           <Link to={`/post/${post.id}`} className="block">
-            <p className="text-foreground leading-relaxed">{post.content}</p>
+            <p className="text-black leading-relaxed">{post.content}</p>
           </Link>
 
           {/* Actions row */}
