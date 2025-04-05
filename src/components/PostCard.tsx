@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -33,7 +32,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
   const [isHovering, setIsHovering] = useState(false);
   const { toast } = useToast();
   
-  // Swipe mechanics
   const cardRef = useRef<HTMLDivElement>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -41,20 +39,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   
-  // Minimum required distance to be considered a swipe (in px)
   const minSwipeDistance = 75;
   
-  // Reset swipe state
   const resetSwipe = () => {
     setSwipeOffset(0);
     setSwiping(false);
     setSwipeDirection(null);
   };
 
-  // Handle boost/deboost
   const handleBoost = () => {
     if (userBoosted) {
-      // Undo boost
       setVoteCount(voteCount - 1);
       setUserBoosted(false);
       toast({
@@ -62,7 +56,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
         description: "You've removed your boost",
       });
     } else {
-      // Add boost
       setVoteCount(voteCount + 1);
       setUserBoosted(true);
       toast({
@@ -73,7 +66,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
   };
 
   const handleDeboost = () => {
-    // Always deboost, regardless of current state
     setVoteCount(voteCount - 1);
     setUserBoosted(false);
     toast({
@@ -83,7 +75,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
     });
   };
 
-  // Touch event handlers
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
     setTouchEnd(null);
@@ -96,18 +87,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
     const currentTouch = e.targetTouches[0].clientX;
     setTouchEnd(currentTouch);
     
-    // Calculate offset for animation
     const offset = touchStart ? currentTouch - touchStart : 0;
-    
-    // Cap the offset to avoid extreme movements
     const cappedOffset = Math.max(Math.min(offset, 100), -100);
     setSwipeOffset(cappedOffset);
     
-    // Determine direction for visual feedback
     if (cappedOffset > 0) {
-      setSwipeDirection('right'); // Boost
+      setSwipeDirection('right');
     } else if (cappedOffset < 0) {
-      setSwipeDirection('left'); // Deboost
+      setSwipeDirection('left');
     } else {
       setSwipeDirection(null);
     }
@@ -124,18 +111,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
     const isRightSwipe = distance > minSwipeDistance;
     
     if (isLeftSwipe) {
-      // Swiped left - deboost
       handleDeboost();
     } else if (isRightSwipe) {
-      // Swiped right - boost
       handleBoost();
     }
     
-    // Reset after processing
     resetSwipe();
   };
 
-  // Cleanup any animations on unmount
   useEffect(() => {
     return () => {
       resetSwipe();
@@ -173,7 +156,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
         transition: swiping ? 'none' : 'transform 0.3s ease-out',
       }}
     >
-      {/* Swipe indicators - only show while swiping */}
       {swiping && swipeDirection === 'right' && (
         <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-r from-cyberpink to-cyberpurple opacity-70" />
       )}
@@ -182,7 +164,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
       )}
       
       <div className="flex gap-4">
-        {/* Boost Column */}
         <div className="flex flex-col items-center space-y-1">
           <button 
             onClick={handleBoost}
@@ -205,9 +186,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
           </span>
         </div>
 
-        {/* Content Column */}
         <div className="flex-1 space-y-3">
-          {/* Author row */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="relative">
@@ -252,21 +231,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
                 </div>
               </div>
             </div>
-            
-            {/* Show reveal progress percentage */}
-            {!post.author.isRevealed && (
-              <div className="text-xs text-muted-foreground bg-secondary rounded-full px-2 py-0.5">
-                {Math.round(progressPercentage)}% of 11%
-              </div>
-            )}
           </div>
 
-          {/* Post content - Changed text color to black */}
           <Link to={`/post/${post.id}`} className="block">
             <p className="text-black leading-relaxed">{post.content}</p>
           </Link>
 
-          {/* Actions row */}
           <div className="pt-2 flex items-center space-x-4 text-muted-foreground">
             <button className="flex items-center gap-1.5 text-sm hover:text-foreground transition-colors">
               <MessageCircle className="h-4 w-4" />
@@ -280,7 +250,29 @@ const PostCard: React.FC<PostCardProps> = ({ post, compact = false }) => {
         </div>
       </div>
       
-      {/* Swipe instructions - only visible on touch devices */}
+      {!post.author.isRevealed && (
+        <div className="mt-5 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-muted-foreground">
+              Identity Reveal Progress
+            </span>
+            <span className="text-xs font-medium text-cyberpink">
+              {Math.round(progressPercentage)}% of 11%
+            </span>
+          </div>
+          <Progress 
+            value={progressPercentage} 
+            className="h-2 bg-gray-100"
+          />
+          <div className="mt-2 text-xs text-center text-muted-foreground">
+            {post.author.isRevealed ? 
+              "Identity Revealed" : 
+              `${post.author.currentVotes} of ${post.author.voteThreshold} votes needed to reveal identity`
+            }
+          </div>
+        </div>
+      )}
+      
       <div className="mt-3 text-xs text-center text-muted-foreground hidden touch-device:block">
         Swipe right to boost, left to deboost
       </div>
